@@ -1,4 +1,5 @@
 import Navbar from "./components/Navbar";
+import ProductList from "./components/ProductList";
 
 export default function Home() {
   return (
@@ -8,7 +9,10 @@ export default function Home() {
       <section className="px-6 py-16">
         <h1 className="text-4xl font-bold text-green-500">বাজার দর</h1>
 
-        <p className="mt-4 text-lg">প্রতিদিনের বাজারদর জানুন সহজেই।</p>
+        <p className="mt-4 text-lg text-gray-300">
+          প্রতিদিনের বাজারদর জানুন সহজেই।
+        </p>
+        <ProductList />
       </section>
     </main>
   );
