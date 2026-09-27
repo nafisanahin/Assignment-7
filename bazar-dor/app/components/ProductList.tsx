@@ -2,9 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { getProducts, type Product } from "../lib/api";
+import CategoryFilter from "./CategoryFilter";
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const categories = [
+    "all",
+    ...Array.from(new Set(products.map((product) => product.categoryNameBn))),
+  ];
+
+  const filteredProducts =
+    selectedCategory === "all"
+      ? products
+      : products.filter(
+          (product) => product.categoryNameBn === selectedCategory,
+        );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -26,9 +39,14 @@ export default function ProductList() {
   return (
     <section className="mt-10">
       <h2 className="mb-6 text-2xl font-bold">আজকের বাজারদর</h2>
+      <CategoryFilter
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+      />
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <article
             key={product.id}
             className="rounded-xl border border-gray-700 bg-[#1b1b1b] p-5"
