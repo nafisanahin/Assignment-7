@@ -7,25 +7,24 @@ import CategoryFilter from "./CategoryFilter";
 function getProductEmoji(product: Product): string {
   const name = product.nameBn.trim();
 
-  // চাল
+  // Rice
   if (name.includes("চাল")) return "🍚";
 
-  // ডাল
-  if (name.includes("ডাল") || name.includes("ছোলা")) {
-    return "🫘";
-  }
+  // Lentils and pulses
+  if (name.includes("ডাল")) return "🌱";
+  if (name.includes("ছোলা")) return "🟤";
 
-  // তেল
+  // Cooking oil
   if (name.includes("তেল")) return "🫙";
 
-  // সবজি
+  // Vegetables
   if (name.includes("আলু")) return "🥔";
   if (name.includes("পেঁয়াজ") || name.includes("পেঁয়াজ")) return "🧅";
   if (name.includes("কাঁচামরিচ")) return "🌶️";
   if (name.includes("বেগুন")) return "🍆";
   if (name.includes("ঢেঁড়স") || name.includes("ঢেঁড়স")) return "🥬";
 
-  // মাছ
+  // Fish and seafood
   if (name.includes("চিংড়ি") || name.includes("চিংড়ি")) return "🦐";
   if (
     name.includes("মাছ") ||
@@ -35,22 +34,24 @@ function getProductEmoji(product: Product): string {
     return "🐟";
   }
 
-  // মাংস
+  // Meat
   if (name.includes("হাঁসের মাংস")) return "🦆";
   if (name.includes("গরুর মাংস")) return "🥩";
   if (name.includes("খাসির মাংস")) return "🍖";
   if (name.includes("মুরগির মাংস")) return "🍗";
 
-  // ডিম ও দুগ্ধজাত পণ্য
+  // Eggs and dairy
   if (name.includes("ডিম")) return "🥚";
   if (name.includes("দুধ")) return "🥛";
   if (name.includes("দই")) return "🥣";
   if (name.includes("মাখন")) return "🧈";
 
-  // মসলা
-  if (name.includes("আদা")) return "🫚";
+  // Spices
+  if (name.includes("আদা")) return "🟤";
   if (name.includes("রসুন")) return "🧄";
-  if (name.includes("মরিচ গুঁড়া") || name.includes("মরিচ গুঁড়া")) return "🌶️";
+  if (name.includes("মরিচ গুঁড়া") || name.includes("মরিচ গুঁড়া")) {
+    return "🌶️";
+  }
   if (name.includes("ধনেপাতা")) return "🌿";
 
   return product.categoryIcon || "🛒";
@@ -59,6 +60,7 @@ function getProductEmoji(product: Product): string {
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -67,12 +69,16 @@ export default function ProductList() {
     ...Array.from(new Set(products.map((product) => product.categoryNameBn))),
   ];
 
-  const filteredProducts =
-    selectedCategory === "all"
-      ? products
-      : products.filter(
-          (product) => product.categoryNameBn === selectedCategory,
-        );
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory =
+      selectedCategory === "all" || product.categoryNameBn === selectedCategory;
+
+    const matchesSearch = product.nameBn
+      .toLowerCase()
+      .includes(searchTerm.trim().toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
 
   useEffect(() => {
     getProducts()
@@ -84,14 +90,23 @@ export default function ProductList() {
   if (loading) {
     return <p className="mt-8 text-gray-400">বাজারদর লোড হচ্ছে...</p>;
   }
-
   if (error) {
-    return <p className="mt-8 text-red-400">{error}</p>;
+    return <p className="mt-8 text-red-500">{error}</p>;
   }
 
   return (
-    <section className="mt-10">
-      <h2 className="mb-6 text-xl font-bold text-white">🔥 আজকের বাজারদর</h2>
+    <section className="mt-8">
+      <h2 className="mb-5 text-xl font-bold text-gray-900">🔥 আজকের বাজারদর</h2>
+
+      <div className="mb-5">
+        <input
+          type="text"
+          placeholder="পণ্যের নাম লিখে খুঁজুন..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-green-500 sm:max-w-md"
+        />
+      </div>
 
       <CategoryFilter
         categories={categories}
@@ -99,14 +114,16 @@ export default function ProductList() {
         onSelectCategory={setSelectedCategory}
       />
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {filteredProducts.map((product) => (
           <article
             key={product.id}
-            className="flex min-h-20 items-center gap-3 rounded-xl border border-gray-200 bg-[#f8faf8] p-3 text-gray-900 shadow-sm transition hover:shadow-md"
+            className="flex min-h-24 items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 text-gray-900 shadow-sm transition hover:shadow-md"
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#eef3ed] text-2xl">
-              {getProductEmoji(product)}
+              <span role="img" aria-label={product.nameBn}>
+                {getProductEmoji(product)}
+              </span>
             </div>
 
             <div className="min-w-0 flex-1">
