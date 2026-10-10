@@ -26,5 +26,16 @@ export async function getProducts(): Promise<Product[]> {
     throw new Error("Failed to fetch products");
   }
 
-  return response.json();
+  const data: Product[] = await response.json();
+
+  console.log("First product:", data[0]);
+  console.log("First product image URL:", data[0]?.image);
+  console.table(
+    data.map((p) => ({
+      nameBn: p.nameBn,
+      category: p.category,
+      categoryIcon: p.categoryIcon,
+    })),
+  );
+  return data;
 }
